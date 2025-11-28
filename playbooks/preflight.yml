@@ -1,3 +1,4 @@
-- hosts: all
+- name: Preflight checks
+  hosts: all
   roles:
     - preflight

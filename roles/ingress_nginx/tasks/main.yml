@@ -1,0 +1,6 @@
+- name: Install Ingress NGINX Controller
+  ansible.builtin.command: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  args:
+    creates: /etc/kubernetes/manifests/ingress-nginx.yaml

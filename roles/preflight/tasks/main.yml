@@ -4,3 +4,9 @@
       - ansible_distribution == 'Ubuntu'
       - ansible_distribution_version is version('20.04', '>=')
     fail_msg: 'Ubuntu 20.04 or later required.'
+
+- name: Check swap is disabled
+  ansible.builtin.command: swapon --summary
+  register: swap_status
+  changed_when: false
+  failed_when: swap_status.stdout != ''

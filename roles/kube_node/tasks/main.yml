@@ -1,0 +1,4 @@
+- name: Join Kubernetes node
+  ansible.builtin.command: kubeadm join {{ master_ip }} --token {{ token }}
+  args:
+    creates: /etc/kubernetes/kubelet.conf

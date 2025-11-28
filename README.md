@@ -1,17 +1,19 @@
 ![CI](https://github.com/your-org/your-repo/actions/workflows/ci.yml/badge.svg)
 
-# Ansible Kubernetes Deployment Repo
+# 🚀 Ansible Kubernetes Deployment Repository
 
-## 📌 Overview
-This repository provides an Ansible-based automation for deploying a Kubernetes cluster with best practices.
+## ✅ Overview
+This repository provides a **production-ready Ansible automation** for deploying Kubernetes clusters with best practices, Molecule testing, and CI/CD integration.
 
-### ✅ Features
-- Pre-flight checks (OS, swap, etc.)
+### Features
+- Pre-flight checks (OS validation, swap disabled)
 - Kubernetes master and node setup
 - CNI installation (Calico)
 - Ingress Controller (NGINX)
-- Environment-specific inventories (prod/dev)
 - Addons: Metrics Server, Kubernetes Dashboard
+- RBAC configuration for Dashboard
+- Molecule tests for all roles
+- GitHub Actions pipeline for linting and testing
 
 ---
 
@@ -30,7 +32,7 @@ ansible-galaxy install -r requirements.yml
 
 ## 📂 Repository Structure
 ```
-ansible-k8s/
+ansible-k8s-clean/
 ├── inventories/
 │   ├── prod/
 │   │   ├── hosts.yml
@@ -41,10 +43,10 @@ ansible-k8s/
 ├── roles/
 │   ├── common/
 │   ├── preflight/
-│   ├── kube-master/
-│   ├── kube-node/
-│   ├── cni-calico/
-│   ├── ingress-nginx/
+│   ├── kube_master/
+│   ├── kube_node/
+│   ├── cni_calico/
+│   ├── ingress_nginx/
 │   └── dashboard/
 ├── playbooks/
 │   ├── site.yml
@@ -53,12 +55,13 @@ ansible-k8s/
 │   └── addons.yml
 ├── group_vars/
 ├── ansible.cfg
-└── requirements.yml
+├── requirements.yml
+└── README.md
 ```
 
 ---
 
-## ▶️ How to Use
+## ▶️ Getting Started
 ### 1. Update Inventory
 Edit `inventories/prod/hosts.yml` or `inventories/dev/hosts.yml` with your node IPs.
 
@@ -77,42 +80,42 @@ ansible-playbook -i inventories/prod playbooks/cluster.yml
 ansible-playbook -i inventories/prod playbooks/addons.yml
 ```
 
----
-
-## ✅ Best Practices
-- Use tags: `--tags preflight` or `--tags cni`
-- Keep variables in `group_vars` or role defaults
-- Test roles with Molecule before production
-
----
-
-## 🧪 Running Molecule Tests Locally
-To test roles locally using Molecule:
-```bash
-# Install Molecule and Docker driver
-pip install molecule[docker]
-
-# Navigate to a role and run tests
-cd roles/<role_name>
-molecule test
-```
-This will create a Docker container, apply the role, and verify its behavior.
-
----
-
-## 🔐 Enabling and Accessing Addons
-### Metrics Server and Dashboard
-After running `playbooks/addons.yml`, enable RBAC for Dashboard:
+### 5. Enable Dashboard RBAC
 ```bash
 ansible-playbook -i inventories/prod roles/dashboard/tasks/main.yml
 ```
 
-### Access Dashboard
-Create a token for admin-user:
+---
+
+## 🖼 Screenshots (Placeholders)
+![Cluster Setup](docs/images/cluster_setup.png)
+![Dashboard UI](docs/images/dashboard_ui.png)
+
+---
+
+## 🧪 Molecule Testing
+Run Molecule tests locally:
 ```bash
-kubectl -n kubernetes-dashboard create token admin-user
+pip install molecule[docker]
+cd roles/<role_name>
+molecule test
 ```
-Use this token to log in via the Dashboard UI.
+
+---
+
+## 🔄 CI/CD Integration
+GitHub Actions pipeline runs:
+- `ansible-lint` for code quality
+- Molecule tests for all roles
+
+Add the workflow in `.github/workflows/ci.yml`.
+
+---
+
+## 💡 Advanced Tips
+- Use tags: `--tags preflight` or `--tags cni`
+- Keep variables in `group_vars` or role defaults
+- Validate cluster health with `kubectl get nodes`
 
 ---
 

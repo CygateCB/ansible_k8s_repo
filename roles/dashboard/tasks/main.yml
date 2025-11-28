@@ -1,6 +1,7 @@
 - name: Create admin-user ServiceAccount
   ansible.builtin.copy:
     dest: /tmp/dashboard-admin-user.yaml
+    mode: '0644'
     content: |
       apiVersion: v1
       kind: ServiceAccount
@@ -11,6 +12,7 @@
 - name: Create ClusterRoleBinding for admin-user
   ansible.builtin.copy:
     dest: /tmp/dashboard-clusterrolebinding.yaml
+    mode: '0644'
     content: |
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding

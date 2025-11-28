@@ -1,6 +1,9 @@
-- hosts: master
+- name: Master setup
+  hosts: master
   roles:
-    - kube-master
-- hosts: nodes
+    - kube_master
+
+- name: Node setup
+  hosts: nodes
   roles:
-    - kube-node
+    - kube_node

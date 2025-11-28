@@ -1,8 +1,10 @@
-- hosts: all
+- name: Full cluster setup
+  hosts: all
   roles:
     - common
     - preflight
-    - kube-master
-    - kube-node
-    - cni-calico
-    - ingress-nginx
+    - kube_master
+    - kube_node
+    - cni_calico
+    - ingress_nginx
+    - dashboard
