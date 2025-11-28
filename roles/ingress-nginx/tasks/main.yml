@@ -1,0 +1,4 @@
+- name: Install ingress-nginx
+  ansible.builtin.command: kubectl apply -f https://k8s.io/ingress-nginx.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

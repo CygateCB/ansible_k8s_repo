@@ -1,0 +1,6 @@
+- name: Check OS version
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'Ubuntu'
+      - ansible_distribution_version is version('20.04', '>=')
+    fail_msg: 'Ubuntu 20.04 or later required.'

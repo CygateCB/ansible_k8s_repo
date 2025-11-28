@@ -1,0 +1,6 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Check if role applied successfully
+      ansible.builtin.ping:

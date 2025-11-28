@@ -1,0 +1,6 @@
+- hosts: master
+  roles:
+    - kube-master
+- hosts: nodes
+  roles:
+    - kube-node
