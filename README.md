@@ -1,3 +1,5 @@
+![CI](https://github.com/your-org/your-repo/actions/workflows/ci.yml/badge.svg)
+
 # Ansible Kubernetes Deployment Repo
 
 ## 📌 Overview
@@ -79,6 +81,20 @@ ansible-playbook -i inventories/prod playbooks/addons.yml
 - Use tags: `--tags preflight` or `--tags cni`
 - Keep variables in `group_vars` or role defaults
 - Test roles with Molecule before production
+
+---
+
+## 🧪 Running Molecule Tests Locally
+To test roles locally using Molecule:
+```bash
+# Install Molecule and Docker driver
+pip install molecule[docker]
+
+# Navigate to a role and run tests
+cd roles/<role_name>
+molecule test
+```
+This will create a Docker container, apply the role, and verify its behavior.
 
 ---
 
