@@ -1,5 +1,9 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    master_ip: "192.168.1.10"
+    token: "abcdef.0123456789abcdef"
+    ca_cert_hash: "sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
   roles:
-    - role: ../..
+    - role: kube_node

@@ -1,4 +1,21 @@
+---
+- name: Ensure kubeadm is installed
+  ansible.builtin.package:
+    name: kubeadm
+    state: present
+
+- name: Validate kubeadm binary exists
+  ansible.builtin.stat:
+    path: /usr/bin/kubeadm
+  register: kubeadm_binary
+
+- name: Fail if kubeadm is not installed
+  ansible.builtin.fail:
+    msg: "kubeadm is not installed. Please install kubeadm before proceeding."
+  when: not kubeadm_binary.stat.exists
+
 - name: Initialize Kubernetes master
-  ansible.builtin.command: kubeadm init --pod-network-cidr=192.168.0.0/16
+  ansible.builtin.command: kubeadm init --pod-network-cidr={{ pod_network_cidr }}
   args:
     creates: /etc/kubernetes/admin.conf
+  when: kubeadm_binary.stat.exists

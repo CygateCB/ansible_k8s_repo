@@ -1,4 +1,15 @@
-- name: Create admin-user ServiceAccount
+---
+- name: Ensure kubectl is available
+  ansible.builtin.stat:
+    path: /usr/bin/kubectl
+  register: kubectl_binary
+
+- name: Fail if kubectl is not installed
+  ansible.builtin.fail:
+    msg: "kubectl is not installed. Please install kubectl before proceeding."
+  when: not kubectl_binary.stat.exists
+
+- name: Create admin-user ServiceAccount manifest
   ansible.builtin.copy:
     dest: /tmp/dashboard-admin-user.yaml
     mode: '0644'
@@ -9,7 +20,7 @@
         name: admin-user
         namespace: kubernetes-dashboard
 
-- name: Create ClusterRoleBinding for admin-user
+- name: Create ClusterRoleBinding manifest
   ansible.builtin.copy:
     dest: /tmp/dashboard-clusterrolebinding.yaml
     mode: '0644'
@@ -31,8 +42,24 @@
   ansible.builtin.command: kubectl apply -f /tmp/dashboard-admin-user.yaml
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
+  args:
+    creates: /tmp/dashboard-admin-user-applied
+  when: kubectl_binary.stat.exists
+
+- name: Mark admin-user applied
+  ansible.builtin.file:
+    path: /tmp/dashboard-admin-user-applied
+    state: touch
 
 - name: Apply ClusterRoleBinding manifest
   ansible.builtin.command: kubectl apply -f /tmp/dashboard-clusterrolebinding.yaml
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
+  args:
+    creates: /tmp/dashboard-clusterrolebinding-applied
+  when: kubectl_binary.stat.exists
+
+- name: Mark ClusterRoleBinding applied
+  ansible.builtin.file:
+    path: /tmp/dashboard-clusterrolebinding-applied
+    state: touch

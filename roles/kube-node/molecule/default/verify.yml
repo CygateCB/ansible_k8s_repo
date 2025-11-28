@@ -1,6 +1,13 @@
 ---
-- name: Verify
+- name: Verify node join
   hosts: all
   tasks:
-    - name: Check if role applied successfully
-      ansible.builtin.ping:
+    - name: Check if kubelet.conf exists
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: kubelet_conf
+
+    - name: Assert node is joined
+      ansible.builtin.assert:
+        that:
+          - kubelet_conf.stat.exists

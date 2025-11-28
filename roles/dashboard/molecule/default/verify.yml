@@ -1,6 +1,19 @@
 ---
-- name: Verify
+- name: Verify RBAC application
   hosts: all
   tasks:
-    - name: Check if role applied successfully
-      ansible.builtin.ping:
+    - name: Check if marker files exist
+      ansible.builtin.stat:
+        path: /tmp/dashboard-admin-user-applied
+      register: admin_marker
+
+    - name: Check if ClusterRoleBinding marker exists
+      ansible.builtin.stat:
+        path: /tmp/dashboard-clusterrolebinding-applied
+      register: crb_marker
+
+    - name: Assert RBAC manifests applied
+      ansible.builtin.assert:
+        that:
+          - admin_marker.stat.exists
+          - crb_marker.stat.exists

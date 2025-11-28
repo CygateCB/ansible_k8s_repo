@@ -1,6 +1,13 @@
 ---
-- name: Verify
+- name: Verify Calico installation
   hosts: all
   tasks:
-    - name: Check if role applied successfully
-      ansible.builtin.ping:
+    - name: Check if Calico marker file exists
+      ansible.builtin.stat:
+        path: /etc/cni/net.d/calico-kubeconfig
+      register: calico_marker
+
+    - name: Assert Calico is installed
+      ansible.builtin.assert:
+        that:
+          - calico_marker.stat.exists
