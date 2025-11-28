@@ -1,0 +1,11 @@
+---
+# Ansible Lint Configuration
+skip_list:
+  - experimental  # Skip experimental rules
+  - yaml  # Skip YAML formatting warnings
+  - role-name  # Ignore role name pattern issues (already fixed)
+warn_list:
+  - command-instead-of-module
+  - risky-shell-pipe
+verbosity: 1
+parseable: true
