@@ -11,6 +11,7 @@ This repository provides an Ansible-based automation for deploying a Kubernetes 
 - CNI installation (Calico)
 - Ingress Controller (NGINX)
 - Environment-specific inventories (prod/dev)
+- Addons: Metrics Server, Kubernetes Dashboard
 
 ---
 
@@ -43,7 +44,8 @@ ansible-k8s/
 │   ├── kube-master/
 │   ├── kube-node/
 │   ├── cni-calico/
-│   └── ingress-nginx/
+│   ├── ingress-nginx/
+│   └── dashboard/
 ├── playbooks/
 │   ├── site.yml
 │   ├── preflight.yml
@@ -95,6 +97,22 @@ cd roles/<role_name>
 molecule test
 ```
 This will create a Docker container, apply the role, and verify its behavior.
+
+---
+
+## 🔐 Enabling and Accessing Addons
+### Metrics Server and Dashboard
+After running `playbooks/addons.yml`, enable RBAC for Dashboard:
+```bash
+ansible-playbook -i inventories/prod roles/dashboard/tasks/main.yml
+```
+
+### Access Dashboard
+Create a token for admin-user:
+```bash
+kubectl -n kubernetes-dashboard create token admin-user
+```
+Use this token to log in via the Dashboard UI.
 
 ---
 
