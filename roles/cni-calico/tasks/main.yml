@@ -1,3 +1,4 @@
+---
 - name: Install Calico CNI
   ansible.builtin.get_url:
     url: https://docs.projectcalico.org/manifests/calico.yaml
