@@ -1,4 +1,5 @@
-- name: Check OS version
+---
+- name: Validate OS version
   ansible.builtin.assert:
     that:
       - ansible_distribution == 'Ubuntu'
@@ -7,6 +8,33 @@
 
 - name: Check swap is disabled
   ansible.builtin.command: swapon --summary
-  register: swap_status
+  register: preflight_swap_status
   changed_when: false
-  failed_when: swap_status.stdout != ''
+  failed_when: preflight_swap_status.stdout != ''
+
+- name: Ensure required kernel modules are loaded
+  ansible.builtin.modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Enable net.bridge.bridge-nf-call-iptables
+  ansible.builtin.sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: '1'
+    state: present
+    reload: yes
+
+- name: Enable net.ipv4.ip_forward
+  ansible.builtin.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    state: present
+    reload: yes
+
+- name: Disable swap permanently
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\\s+swap\\s+)'
+    replace: '#\\1'
+  when: preflight_swap_status.stdout != ''
+
