@@ -1,5 +1,5 @@
 ---
- name: Full cluster setup
+- name: Full cluster setup
   hosts: all
   roles:
     - { role: common, tags: ['common'] }
@@ -9,3 +9,4 @@
     - { role: cni_calico, tags: ['network', 'calico'] }
     - { role: ingress_nginx, tags: ['ingress'] }
     - { role: dashboard, tags: ['dashboard'] }
+

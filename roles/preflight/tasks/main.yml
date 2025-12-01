@@ -1,6 +1,7 @@
 ---
 - name: Disable swap
   ansible.builtin.command: swapoff -a
+  changed_when: false
   when: ansible_swaptotal_mb > 0
   tags:
     - preflight
@@ -19,10 +20,9 @@
   ansible.builtin.shell: |
     modprobe br_netfilter
     modprobe overlay
+  changed_when: false
   args:
     creates: /proc/sys/net/bridge/bridge-nf-call-iptables
   tags:
     - preflight
     - kernel
-
-
