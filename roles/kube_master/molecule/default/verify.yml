@@ -1,13 +1,13 @@
 ---
-- name: Verify master initialization
+- name: Verify kubeadm configuration
   hosts: all
   tasks:
     - name: Check if admin.conf exists
       ansible.builtin.stat:
         path: /etc/kubernetes/admin.conf
-      register: admin_conf
+      register: kube_master_admin_conf
 
-    - name: Assert master is initialized
+    - name: Assert admin.conf exists
       ansible.builtin.assert:
         that:
-          - admin_conf.stat.exists
+          - kube_master_admin_conf.stat.exists

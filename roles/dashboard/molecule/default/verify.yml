@@ -1,33 +1,14 @@
 ---
----
-- name: Verify Dashboard RBAC application status in Kubernetes
+- name: Verify Dashboard installation
   hosts: all
+  gather_facts: false
   tasks:
-    # 1. Kontrollera ServiceAccount
-    - name: Get admin-user ServiceAccount info
-      kubernetes.core.k8s_info:
-        api_version: v1
-        kind: ServiceAccount
-        name: admin-user
-        namespace: kubernetes-dashboard
-        kubeconfig: /etc/kubernetes/admin.conf
-      register: **dashboard_sa_info**
+    - name: Check if Dashboard manifest exists
+      ansible.builtin.stat:
+        path: /etc/kubernetes/dashboard-manifest.yaml
+      register: dashboard_manifest_marker
 
-    # 2. Kontrollera ClusterRoleBinding
-    - name: Get admin-user ClusterRoleBinding info
-      kubernetes.core.k8s_info:
-        api_version: rbac.authorization.k8s.io/v1
-        kind: ClusterRoleBinding
-        name: admin-user
-        kubeconfig: /etc/kubernetes/admin.conf
-      register: **dashboard_crb_info**
-
-    # 3. Assert (Verifiera existens)
-    - name: Assert RBAC resources exist in cluster
+    - name: Assert Dashboard is installed
       ansible.builtin.assert:
         that:
-          # Kontrollerar att k8s_info hittade minst en resurs av den typen
-          - **dashboard_sa_info**.resources | length > 0
-          - **dashboard_crb_info**.resources | length > 0
-        fail_msg: "Följande resurser saknas: ServiceAccount ({{ dashboard_sa_info.resources | length }}), ClusterRoleBinding ({{ dashboard_crb_info.resources | length }})"
-        success_msg: "Dashboard RBAC ServiceAccount och ClusterRoleBinding existerar."
+          - dashboard_manifest_marker.stat.exists

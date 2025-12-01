@@ -1,41 +1,33 @@
 ---
----
-# ------------------------------------------------
-# KUBECTL PRE-FLIGHT CHECK (Endast uppdatering av variabelnamnet)
-# ------------------------------------------------
+# KUBECTL PRE-FLIGHT CHECK
 - name: Ensure kubectl is available
   ansible.builtin.stat:
     path: /usr/bin/kubectl
-  register: **dashboard_kubectl_binary** # <-- FIX: Prefixad variabel
+  register: dashboard_kubectl_binary  # Prefixad variabel
 
 - name: Fail if kubectl is not installed
   ansible.builtin.fail:
     msg: "kubectl is not installed. Please install kubectl before proceeding."
-  when: not **dashboard_kubectl_binary**.stat.exists
+  when: not dashboard_kubectl_binary.stat.exists
 
-# ------------------------------------------------
 # RBAC DEPLOYMENT (Använder k8s-modulen för idempotens)
-# ------------------------------------------------
-
 - name: Apply admin-user ServiceAccount (Idempotent)
   kubernetes.core.k8s:
     state: present
     kubeconfig: /etc/kubernetes/admin.conf
-    # Definierar ServiceAccount direkt i tasken
-    definition: |
+    definition:
       apiVersion: v1
       kind: ServiceAccount
       metadata:
         name: admin-user
         namespace: kubernetes-dashboard
-  when: **dashboard_kubectl_binary**.stat.exists # Behöver endast köras om kubectl finns
-  
+  when: dashboard_kubectl_binary.stat.exists
+
 - name: Apply ClusterRoleBinding (Idempotent)
   kubernetes.core.k8s:
     state: present
     kubeconfig: /etc/kubernetes/admin.conf
-    # Definierar ClusterRoleBinding direkt i tasken
-    definition: |
+    definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
       metadata:
@@ -45,7 +37,7 @@
         kind: ClusterRole
         name: cluster-admin
       subjects:
-      - kind: ServiceAccount
-        name: admin-user
-        namespace: kubernetes-dashboard
-  when: **dashboard_kubectl_binary**.stat.exists # Behöver endast köras om kubectl finns
+        - kind: ServiceAccount
+          name: admin-user
+          namespace: kubernetes-dashboard
+  when: dashboard_kubectl_binary.stat.exists
