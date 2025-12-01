@@ -1,10 +1,15 @@
 ---
-- name: Check if kubelet.conf exists
-  ansible.builtin.stat:
-    path: /etc/kubernetes/kubelet.conf
-  register: kube_node_kubelet_conf
+- name: Verify node join
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check if kubelet.conf exists
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: kube_node_kubelet_conf
 
-- name: Assert node is joined
-  ansible.builtin.assert:
-    that:
-      - kube_node_kubelet_conf.stat.exists
+    - name: Assert node is joined
+      ansible.builtin.assert:
+        that:
+          - kube_node_kubelet_conf.stat.exists
+
