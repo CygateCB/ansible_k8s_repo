@@ -1,30 +1,41 @@
 ---
+---
+# ------------------------------------------------
+# KUBECTL PRE-FLIGHT CHECK (Endast uppdatering av variabelnamnet)
+# ------------------------------------------------
 - name: Ensure kubectl is available
   ansible.builtin.stat:
     path: /usr/bin/kubectl
-  register: kubectl_binary
+  register: **dashboard_kubectl_binary** # <-- FIX: Prefixad variabel
 
 - name: Fail if kubectl is not installed
   ansible.builtin.fail:
     msg: "kubectl is not installed. Please install kubectl before proceeding."
-  when: not kubectl_binary.stat.exists
+  when: not **dashboard_kubectl_binary**.stat.exists
 
-- name: Create admin-user ServiceAccount manifest
-  ansible.builtin.copy:
-    dest: /tmp/dashboard-admin-user.yaml
-    mode: '0644'
-    content: |
+# ------------------------------------------------
+# RBAC DEPLOYMENT (Använder k8s-modulen för idempotens)
+# ------------------------------------------------
+
+- name: Apply admin-user ServiceAccount (Idempotent)
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/kubernetes/admin.conf
+    # Definierar ServiceAccount direkt i tasken
+    definition: |
       apiVersion: v1
       kind: ServiceAccount
       metadata:
         name: admin-user
         namespace: kubernetes-dashboard
-
-- name: Create ClusterRoleBinding manifest
-  ansible.builtin.copy:
-    dest: /tmp/dashboard-clusterrolebinding.yaml
-    mode: '0644'
-    content: |
+  when: **dashboard_kubectl_binary**.stat.exists # Behöver endast köras om kubectl finns
+  
+- name: Apply ClusterRoleBinding (Idempotent)
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/kubernetes/admin.conf
+    # Definierar ClusterRoleBinding direkt i tasken
+    definition: |
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
       metadata:
@@ -37,29 +48,4 @@
       - kind: ServiceAccount
         name: admin-user
         namespace: kubernetes-dashboard
-
-- name: Apply admin-user manifest
-  ansible.builtin.command: kubectl apply -f /tmp/dashboard-admin-user.yaml
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-  args:
-    creates: /tmp/dashboard-admin-user-applied
-  when: kubectl_binary.stat.exists
-
-- name: Mark admin-user applied
-  ansible.builtin.file:
-    path: /tmp/dashboard-admin-user-applied
-    state: touch
-
-- name: Apply ClusterRoleBinding manifest
-  ansible.builtin.command: kubectl apply -f /tmp/dashboard-clusterrolebinding.yaml
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-  args:
-    creates: /tmp/dashboard-clusterrolebinding-applied
-  when: kubectl_binary.stat.exists
-
-- name: Mark ClusterRoleBinding applied
-  ansible.builtin.file:
-    path: /tmp/dashboard-clusterrolebinding-applied
-    state: touch
+  when: **dashboard_kubectl_binary**.stat.exists # Behöver endast köras om kubectl finns
