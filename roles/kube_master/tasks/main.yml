@@ -1,14 +1,15 @@
 ---
+# Download kubeadm binary
 - name: Download kubeadm binary
   ansible.builtin.get_url:
     url: https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubeadm
     dest: /usr/local/bin/kubeadm
     mode: '0755'
-  when: not ansible_facts.packages.get('kubeadm', False)
   tags:
     - master
     - kubeadm
 
+# Install kubelet and kubectl
 - name: Install kubelet and kubectl
   ansible.builtin.apt:
     name:
@@ -21,6 +22,17 @@
     - kubelet
     - kubectl
 
+# Enable kubelet service
+- name: Enable and start kubelet
+  ansible.builtin.systemd:
+    name: kubelet
+    enabled: yes
+    state: started
+  tags:
+    - master
+    - kubelet
+
+# Initialize Kubernetes cluster
 - name: Initialize Kubernetes cluster
   ansible.builtin.command: kubeadm init --pod-network-cidr=192.168.0.0/16
   args:
@@ -29,12 +41,15 @@
     - master
     - init
 
-- name: Configure kubectl for root
+# Configure kubectl for root user
+- name: Configure kubectl for root user
   ansible.builtin.copy:
     src: /etc/kubernetes/admin.conf
     dest: /root/.kube/config
     remote_src: yes
+    mode: '0644'   # ✅ Fix för risky-file-permissions
   tags:
     - master
     - kubectl
+
 

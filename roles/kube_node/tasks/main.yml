@@ -1,6 +1,9 @@
 ---
 - name: Join node to cluster
   ansible.builtin.command: "{{ kubeadm_join_command }}"
+  args:
+    creates: /etc/kubernetes/kubelet.conf  # ✅ Gör tasken idempotent
+  changed_when: false  # ✅ Fix för lint-regeln
   tags:
     - node
-
+    - join

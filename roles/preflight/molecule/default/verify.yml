@@ -4,21 +4,20 @@
   tasks:
     - name: Check swap is disabled
       ansible.builtin.command: swapon --summary
-      register: swap_status
+      register: preflight_swap_status
       changed_when: false
 
     - name: Assert swap is disabled
       ansible.builtin.assert:
         that:
-          - swap_status.stdout == ""
+          - preflight_swap_status.stdout == ""
 
     - name: Check kernel module br_netfilter
       ansible.builtin.command: lsmod | grep br_netfilter
-      register: br_netfilter_status
+      register: preflight_br_netfilter_status
       changed_when: false
 
     - name: Assert br_netfilter is loaded
       ansible.builtin.assert:
         that:
-          - "'br_netfilter' in br_netfilter_status.stdout"
-
+          - "'br_netfilter' in preflight_br_netfilter_status.stdout"

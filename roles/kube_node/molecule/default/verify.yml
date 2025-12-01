@@ -5,21 +5,22 @@
     - name: Check kubelet.conf exists
       ansible.builtin.stat:
         path: /etc/kubernetes/kubelet.conf
-      register: kubelet_conf
+      register: kube_node_kubelet_conf
 
     - name: Assert kubelet.conf exists
       ansible.builtin.assert:
         that:
-          - kubelet_conf.stat.exists
+          - kube_node_kubelet_conf.stat.exists
 
-    - name: Check kubelet service running
-      ansible.builtin.command: systemctl is-active kubelet
-      register: kubelet_service
-      changed_when: false
+    - name: Check kubelet service status
+      ansible.builtin.systemd:
+        name: kubelet
+      register: kube_node_kubelet_service
 
     - name: Assert kubelet service is active
       ansible.builtin.assert:
         that:
-          - "'active' in kubelet_service.stdout"
+          - kube_node_kubelet_service.status == 'running'
+
 
 
