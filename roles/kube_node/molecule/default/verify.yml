@@ -1,7 +1,4 @@
 ---
-- name: Verify node join
-  hosts: all
-  
 - name: Check if kubelet.conf exists
   ansible.builtin.stat:
     path: /etc/kubernetes/kubelet.conf
