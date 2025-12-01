@@ -1,0 +1,5 @@
+---
+# roles/common/defaults/main.yml
+common_packages:
+  - curl
+  - vim

@@ -14,5 +14,5 @@
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
   args:
-    creates: /etc/kubernetes/manifests/ingress-nginx.yaml
+    creates: /etc/kubernetes/manifests/ingress_nginx.yaml
   when: ingress_nginx_kubectl_binary.stat.exist
