@@ -1,6 +1,6 @@
 ---
 - name: Download kubeadm binary
-  get_url:
+  ansible.builtin.get_url:
     url: https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubeadm
     dest: /usr/local/bin/kubeadm
     mode: '0755'
