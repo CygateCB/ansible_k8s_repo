@@ -1,13 +1,14 @@
 ---
-- name: Verify Ingress NGINX installation
+- name: Verify ingress-nginx installation
   hosts: all
   tasks:
-    - name: Check if Ingress manifest exists
-      ansible.builtin.stat:
-        path: /etc/kubernetes/ingress-nginx.yaml
-      register: ingress_nginx_ingress_manifest
+    - name: Check ingress-nginx manifest applied
+      ansible.builtin.command: ls /etc/kubernetes/manifests/ingress-nginx-controller.yaml
+      register: ingress_manifest
+      changed_when: false
 
-    - name: Assert Ingress NGINX is installed
+    - name: Assert ingress-nginx manifest exists
       ansible.builtin.assert:
         that:
-          - ingress_nginx_ingress_manifest.stat.exists
+          - ingress_manifest.rc == 0
+

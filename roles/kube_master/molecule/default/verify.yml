@@ -11,3 +11,13 @@
       ansible.builtin.assert:
         that:
           - kube_master_admin_conf.stat.exists
+
+    - name: Check kubeadm binary
+      ansible.builtin.stat:
+        path: /usr/local/bin/kubeadm
+      register: kubeadm_binary
+
+    - name: Assert kubeadm binary exists
+      ansible.builtin.assert:
+        that:
+          - kubeadm_binary.stat.exists

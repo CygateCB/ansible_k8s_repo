@@ -1,14 +1,14 @@
 ---
-- name: Verify Dashboard installation
+- name: Verify Kubernetes Dashboard installation
   hosts: all
-  gather_facts: false
   tasks:
-    - name: Check if Dashboard manifest exists
-      ansible.builtin.stat:
-        path: /etc/kubernetes/dashboard-manifest.yaml
-      register: dashboard_manifest_marker
+    - name: Check dashboard manifest applied
+      ansible.builtin.command: ls /etc/kubernetes/manifests/kubernetes-dashboard.yaml
+      register: dashboard_manifest
+      changed_when: false
 
-    - name: Assert Dashboard is installed
+    - name: Assert dashboard manifest exists
       ansible.builtin.assert:
         that:
-          - dashboard_manifest_marker.stat.exists
+          - dashboard_manifest.rc == 0
+

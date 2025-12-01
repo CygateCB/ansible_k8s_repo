@@ -1,38 +1,28 @@
 ---
-- name: Validate OS version
-  ansible.builtin.assert:
-    that:
-      - ansible_distribution == 'Ubuntu'
-      - ansible_distribution_version is version('20.04', '>=')
-    fail_msg: 'Ubuntu 20.04 or later required.'
+- name: Disable swap
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+  tags:
+    - preflight
+    - swap
 
-- name: Check swap is disabled
-  ansible.builtin.command: swapon --summary
-  register: preflight_swap_status
-  changed_when: false
-  failed_when: preflight_swap_status.stdout != ''
-
-- name: Ensure required kernel modules are loaded
-  community.general.modprobe:
-    name: br_netfilter
-    state: present
-
-- name: Enable net.bridge.bridge-nf-call-iptables
-  ansible.posix.sysctl:
-    name: net.bridge.bridge-nf-call-iptables
-    value: '1'
-    state: present
-    reload: yes
-
-- name: Enable net.ipv4.ip_forward
-  ansible.posix.sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    state: present
-
-- name: Disable swap permanently
+- name: Ensure swap is disabled in fstab
   ansible.builtin.replace:
     path: /etc/fstab
-    regexp: '^([^#].*\s+swap\s+)'
-    replace: '#\1'
-  when: preflight_swap_status.stdout != ''
+    regexp: '^([^#].*swap.*)$'
+    replace: '# \1'
+  tags:
+    - preflight
+    - swap
+
+- name: Load kernel modules
+  ansible.builtin.shell: |
+    modprobe br_netfilter
+    modprobe overlay
+  args:
+    creates: /proc/sys/net/bridge/bridge-nf-call-iptables
+  tags:
+    - preflight
+    - kernel
+
+

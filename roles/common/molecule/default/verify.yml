@@ -1,6 +1,23 @@
 ---
-- name: Verify
+- name: Verify common packages
   hosts: all
   tasks:
-    - name: Check if role applied successfully
-      ansible.builtin.ping:
+    - name: Check if curl is installed
+      ansible.builtin.command: dpkg -l | grep curl
+      register: curl_check
+      changed_when: false
+
+    - name: Assert curl is installed
+      ansible.builtin.assert:
+        that:
+          - "'curl' in curl_check.stdout"
+
+    - name: Check if vim is installed
+      ansible.builtin.command: dpkg -l | grep vim
+      register: vim_check
+      changed_when: false
+
+    - name: Assert vim is installed
+      ansible.builtin.assert:
+        that:
+          - "'vim' in vim_check.stdout"

@@ -1,43 +1,7 @@
 ---
-# KUBECTL PRE-FLIGHT CHECK
-- name: Ensure kubectl is available
-  ansible.builtin.stat:
-    path: /usr/bin/kubectl
-  register: dashboard_kubectl_binary  # Prefixad variabel
-
-- name: Fail if kubectl is not installed
-  ansible.builtin.fail:
-    msg: "kubectl is not installed. Please install kubectl before proceeding."
-  when: not dashboard_kubectl_binary.stat.exists
-
-# RBAC DEPLOYMENT (Använder k8s-modulen för idempotens)
-- name: Apply admin-user ServiceAccount (Idempotent)
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: /etc/kubernetes/admin.conf
-    definition:
-      apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        name: admin-user
-        namespace: kubernetes-dashboard
-  when: dashboard_kubectl_binary.stat.exists
-
-- name: Apply ClusterRoleBinding (Idempotent)
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: /etc/kubernetes/admin.conf
-    definition:
-      apiVersion: rbac.authorization.k8s.io/v1
-      kind: ClusterRoleBinding
-      metadata:
-        name: admin-user
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: ClusterRole
-        name: cluster-admin
-      subjects:
-        - kind: ServiceAccount
-          name: admin-user
-          namespace: kubernetes-dashboard
-  when: dashboard_kubectl_binary.stat.exists
+- name: Install Kubernetes Dashboard
+  ansible.builtin.command: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+  args:
+    creates: /etc/kubernetes/manifests/kubernetes-dashboard.yaml
+  tags:
+    - dashboard

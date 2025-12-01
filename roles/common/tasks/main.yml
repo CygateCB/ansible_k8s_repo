@@ -1,4 +1,25 @@
-- name: Install common packages
-  ansible.builtin.package:
-    name: ['curl','vim']
+---
+- name: Install basic packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - vim
+      - net-tools
     state: present
+    update_cache: yes
+  tags:
+    - common
+    - packages
+
+- name: Install basic packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - vim
+      - net-tools
+    state: present
+    update_cache: yes
+  tags:
+    - common
+    - packages
+

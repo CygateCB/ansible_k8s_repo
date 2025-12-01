@@ -1,10 +1,11 @@
-- name: Full cluster setup
+---
+ name: Full cluster setup
   hosts: all
   roles:
-    - common
-    - preflight
-    - kube_master
-    - kube_node
-    - cni_calico
-    - ingress_nginx
-    - dashboard
+    - { role: common, tags: ['common'] }
+    - { role: preflight, tags: ['preflight'] }
+    - { role: kube_master, tags: ['master'] }
+    - { role: kube_node, tags: ['node'] }
+    - { role: cni_calico, tags: ['network', 'calico'] }
+    - { role: ingress_nginx, tags: ['ingress'] }
+    - { role: dashboard, tags: ['dashboard'] }

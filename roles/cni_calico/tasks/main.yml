@@ -1,18 +1,8 @@
 ---
-# Definiera url:en i group_vars/all eller roles/cni_calico/defaults/main.yml
-# calico_manifest_url: https://docs.tigera.io/calico/latest/manifests/calico.yaml
-
-- name: Download Calico CNI manifest (Idempotent)
-  ansible.builtin.get_url:
-    url: "{{ calico_manifest_url }}"
-    dest: /tmp/calico.yaml
-    mode: '0644'
-    force: no # Förhindrar onödig nedladdning om filen redan finns
-  
-- name: Apply Calico manifest using k8s module (Idempotent)
-  kubernetes.core.k8s:
-    state: present
-    src: /tmp/calico.yaml
-    kubeconfig: /etc/kubernetes/admin.conf # Använder kubeconfig direkt
-    wait: yes
-    wait_timeout: 300
+- name: Install Calico CNI
+  ansible.builtin.command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  args:
+    creates: /etc/cni/net.d/calico-kubeconfig
+  tags:
+    - network
+    - calico

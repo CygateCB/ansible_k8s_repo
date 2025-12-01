@@ -4,4 +4,37 @@
     url: https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubeadm
     dest: /usr/local/bin/kubeadm
     mode: '0755'
-  register: kube_master_kubeadm_binary
+  when: not ansible_facts.packages.get('kubeadm', False)
+  tags:
+    - master
+    - kubeadm
+
+- name: Install kubelet and kubectl
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubectl
+    state: present
+    update_cache: yes
+  tags:
+    - master
+    - kubelet
+    - kubectl
+
+- name: Initialize Kubernetes cluster
+  ansible.builtin.command: kubeadm init --pod-network-cidr=192.168.0.0/16
+  args:
+    creates: /etc/kubernetes/admin.conf
+  tags:
+    - master
+    - init
+
+- name: Configure kubectl for root
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+  tags:
+    - master
+    - kubectl
+

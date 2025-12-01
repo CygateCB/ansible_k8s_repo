@@ -2,13 +2,12 @@
 - name: Verify Calico installation
   hosts: all
   tasks:
-    - name: CNI Check if Calico kubeconfig exists
-      ansible.builtin.stat:
-        path: /etc/cni/net.d/calico-kubeconfig
-      register: cni_calico_calico_marker
+    - name: Check Calico manifest applied
+      ansible.builtin.command: ls /etc/cni/net.d/calico-kubeconfig
+      register: calico_manifest
+      changed_when: false
 
-    - name: CNI Assert Calico is installed
+    - name: Assert Calico manifest exists
       ansible.builtin.assert:
         that:
-          - cni_calico_calico_marker.stat.exists
-
+          - calico_manifest.rc == 0

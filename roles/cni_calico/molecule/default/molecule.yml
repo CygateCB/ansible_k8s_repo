@@ -1,14 +1,27 @@
 ---
 driver:
-  name: podman
+  name: docker
 platforms:
   - name: instance
-    image: quay.io/ansible/ubuntu20.04-ansible:latest
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
     privileged: true
+    command: /lib/systemd/systemd
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 provisioner:
   name: ansible
-lint: |
-  set -e
-  ansible-lint
+  lint: |
+    yamllint .
+    ansible-lint
+scenario:
+  test_sequence:
+    - lint
+    - destroy
+    - create
+    - converge
+    - converge  # Idempotens-test
+    - verify
+    - destroy
 verifier:
   name: ansible
+

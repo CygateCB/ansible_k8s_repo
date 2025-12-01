@@ -1,7 +1,7 @@
 ---
-- name: Converge scenario for Calico CNI
+- name: Converge
   hosts: all
-  vars:
-    calico_manifest_url: "{{ calico_manifest_url | default('https://docs.projectcalico.org/manifests/calico.yaml') }}"
   roles:
     - role: cni_calico
+      tags: ['network', 'calico']
+
