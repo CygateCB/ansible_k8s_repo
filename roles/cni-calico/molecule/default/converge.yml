@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  vars:
-    calico_manifest_url: "https://docs.projectcalico.org/manifests/calico.yaml"
-  roles:
-    - role: cni_calico
