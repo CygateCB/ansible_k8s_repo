@@ -13,28 +13,26 @@
   failed_when: preflight_swap_status.stdout != ''
 
 - name: Ensure required kernel modules are loaded
-  ansible.builtin.modprobe:
+  community.general.modprobe:
     name: br_netfilter
     state: present
 
 - name: Enable net.bridge.bridge-nf-call-iptables
-  ansible.builtin.sysctl:
+  ansible.posix.sysctl:
     name: net.bridge.bridge-nf-call-iptables
     value: '1'
     state: present
     reload: yes
 
 - name: Enable net.ipv4.ip_forward
-  ansible.builtin.sysctl:
+  ansible.posix.sysctl:
     name: net.ipv4.ip_forward
     value: '1'
     state: present
-    reload: yes
 
 - name: Disable swap permanently
   ansible.builtin.replace:
     path: /etc/fstab
-    regexp: '^([^#].*\\s+swap\\s+)'
-    replace: '#\\1'
+    regexp: '^([^#].*\s+swap\s+)'
+    replace: '#\1'
   when: preflight_swap_status.stdout != ''
-
