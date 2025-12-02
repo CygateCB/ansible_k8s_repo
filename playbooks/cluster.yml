@@ -2,57 +2,11 @@
 - name: Master setup
   hosts: master
   become: true
-  tasks:
-    - name: Download kubeadm binary
-      ansible.builtin.get_url:
-        url: https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubeadm
-        dest: /usr/local/bin/kubeadm
-        mode: '0755'
-
-    - name: Install kubelet and kubectl
-      ansible.builtin.apt:
-        name:
-          - kubelet
-          - kubectl
-        state: present
-        update_cache: yes
-
-    - name: Enable and start kubelet
-      ansible.builtin.systemd:
-        name: kubelet
-        enabled: yes
-        state: started
-
-    - name: Initialize Kubernetes cluster
-      ansible.builtin.command: kubeadm init --pod-network-cidr=192.168.0.0/16
-      args:
-        creates: /etc/kubernetes/admin.conf
-
-    - name: Configure kubectl for root user
-      ansible.builtin.command: cp /etc/kubernetes/admin.conf /root/.kube/config
-      args:
-        creates: /root/.kube/config
-
-    - name: Generate kubeadm join command
-      ansible.builtin.command: kubeadm token create --print-join-command
-      register: join_cmd
-      changed_when: false
-
-    - name: Share join command with all hosts
-      ansible.builtin.add_host:
-        name: "all"
-        kubeadm_join_command: "{{ join_cmd.stdout }}"
+  roles:
+    - kube_master
 
 - name: Node setup
   hosts: nodes
   become: true
-  tasks:
-    - name: Check if node already joined
-      ansible.builtin.stat:
-        path: /etc/kubernetes/kubelet.conf
-      register: kube_node_kubelet_conf
-
-    - name: Join node to cluster
-      ansible.builtin.command: "{{ hostvars['cntrl-node01'].kubeadm_join_command }}"
-      when: not kube_node_kubelet_conf.stat.exists
-      changed_when: false
+  roles:
+    - kube_node

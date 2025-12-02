@@ -42,4 +42,4 @@
 
 - name: Set join command fact
   ansible.builtin.set_fact:
-    kubeadm_join_command: "{{ kube_master_join_cmd.stdout }}"
+    kube_master_kubeadm_join_command: "{{ kube_master_join_cmd.stdout }}"
