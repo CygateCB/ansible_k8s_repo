@@ -1,14 +1,12 @@
 ---
-# Idempotent task for joining a node to Kubernetes cluster
-
 - name: Check if node already joined
   ansible.builtin.stat:
     path: /etc/kubernetes/kubelet.conf
   register: kube_node_kubelet_conf
 
 - name: Join node to cluster
-  ansible.builtin.command: "{{ kubeadm_join_command }}"
-  when: kubeadm_join_command is defined and not kube_node_kubelet_conf.stat.exists
+  ansible.builtin.command: "{{ hostvars['cntrl-node01'].kubeadm_join_command }}"
+  when: not kube_node_kubelet_conf.stat.exists
   changed_when: false
   tags:
     - node
