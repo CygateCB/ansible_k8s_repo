@@ -141,7 +141,49 @@ sudo chmod 666 /var/log/ansible.log
 ```bash
 sudo ansible-galaxy install -r requirements.yml -p /etc/ansible/roles
 ```
+---
+# Best Practice Guide: Ansible Galaxy Installation i CI/CD
 
+## Syfte
+Denna guide hjälper dig att undvika vanliga problem med rättigheter och loggning vid installation av Ansible-roller i CI/CD-pipelines.
+
+## ✅ Använd en korrekt loggfilplats
+- Ställ in `log_path` i `ansible.cfg` till en plats som root alltid kan skriva till, t.ex. `/var/log/ansible.log`.
+- Skapa filen innan pipeline körs:
+```bash
+sudo touch /var/log/ansible.log
+sudo chmod 666 /var/log/ansible.log
+```
+
+## ✅ Undvik att använda /tmp för loggar
+- `/tmp` kan orsaka problem med rättigheter när `sudo` används.
+
+## ✅ Kör installationen med rättigheter
+- Använd `sudo` när du installerar roller globalt:
+```bash
+sudo ansible-galaxy install -r requirements.yml -p /etc/ansible/roles
+```
+
+## ✅ Säkerställ att CI/CD-miljön har:
+- `ansible.cfg` med korrekt `log_path`.
+- Skrivrättigheter till loggfilen.
+- Roller installeras i en katalog som är tillgänglig för Ansible.
+
+## ✅ Tips för säkerhet
+- Undvik att ge 777-rättigheter. Använd 666 för loggfiler.
+- Begränsa sudo-användning till nödvändiga steg.
+
+## ✅ Automatisera detta i pipeline
+Exempel på steg i CI/CD:
+```yaml
+- name: Prepare Ansible log
+  run: |
+    sudo touch /var/log/ansible.log
+    sudo chmod 666 /var/log/ansible.log
+
+- name: Install Ansible roles
+  run: |
+    sudo ansible-galaxy install -r requirements.yml -p /etc/ansible/roles
 ---
 
 ## 💡 Advanced Tips
