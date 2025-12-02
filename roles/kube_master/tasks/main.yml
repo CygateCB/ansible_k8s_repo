@@ -40,6 +40,6 @@
   changed_when: false
   become: true
 
-- name: Share join command with all hosts
-  ansible.builtin.add_host:
-    name: "all"
+- name: Set join command fact
+  ansible.builtin.set_fact:
+    kubeadm_join_command: "{{ kube_master_join_cmd.stdout }}"

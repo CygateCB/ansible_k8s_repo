@@ -22,9 +22,7 @@
   become: true
 
 - name: Join node to cluster
-  ansible.builtin.command: "{{ hostvars['master']['kubeadm_join_command'] }}"
+  ansible.builtin.command: "{{ hostvars['cntrl-node01']['kubeadm_join_command'] }}"
   when: not kube_node_kubelet_conf.stat.exists
   changed_when: false
   become: true
-
-
