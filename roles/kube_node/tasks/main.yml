@@ -1,14 +1,28 @@
 ---
-- name: Check if node already joined
+- name: Install kubelet and kubectl
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubectl
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Enable and start kubelet
+  ansible.builtin.systemd:
+    name: kubelet
+    enabled: yes
+    state: started
+  become: true
+
+- name: Check if node is already part of the cluster
   ansible.builtin.stat:
     path: /etc/kubernetes/kubelet.conf
   register: kube_node_kubelet_conf
+  become: true
 
 - name: Join node to cluster
-  ansible.builtin.command: "{{ hostvars['cntrl-node01'].kubeadm_join_command }}"
+  ansible.builtin.command: "{{ hostvars['master']['kubeadm_join_command'] }}"
   when: not kube_node_kubelet_conf.stat.exists
-  changed_when: false
-  tags:
-    - node
-    - join
+  become: true
 

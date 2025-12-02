@@ -4,6 +4,7 @@
     url: https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubeadm
     dest: /usr/local/bin/kubeadm
     mode: '0755'
+  become: true
 
 - name: Install kubelet and kubectl
   ansible.builtin.apt:
@@ -12,29 +13,33 @@
       - kubectl
     state: present
     update_cache: yes
+  become: true
 
 - name: Enable and start kubelet
   ansible.builtin.systemd:
     name: kubelet
     enabled: yes
     state: started
+  become: true
 
 - name: Initialize Kubernetes cluster
   ansible.builtin.command: kubeadm init --pod-network-cidr=192.168.0.0/16
   args:
     creates: /etc/kubernetes/admin.conf
+  become: true
 
 - name: Configure kubectl for root user
   ansible.builtin.command: cp /etc/kubernetes/admin.conf /root/.kube/config
   args:
     creates: /root/.kube/config
+  become: true
 
 - name: Generate kubeadm join command
   ansible.builtin.command: kubeadm token create --print-join-command
-  register: join_cmd
+  register: kube_master_join_cmd
   changed_when: false
+  become: true
 
 - name: Share join command with all hosts
   ansible.builtin.add_host:
     name: "all"
-    kubeadm_join_command: "{{ join_cmd.stdout }}"
