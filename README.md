@@ -112,6 +112,38 @@ Add the workflow in `.github/workflows/ci.yml`.
 
 ---
 
+## Felsökning
+
+### Problem: Ansible kan inte skriva till loggfilen när du kör med sudo
+
+**Orsak:** När Ansible körs med `sudo` försöker den skriva till `/tmp/ansible.log`, men filen ägs av din användare och är inte skrivbar för root.
+
+### ✅ Snabbfix
+Ändra ägare och rättigheter på `/tmp/ansible.log`:
+```bash
+sudo chown root:root /tmp/ansible.log
+sudo chmod 666 /tmp/ansible.log
+```
+Det gör filen skrivbar för både root och andra.
+
+### ✅ Rekommenderad lösning
+Ändra `log_path` i `ansible.cfg` till en plats som root alltid kan skriva till, t.ex. `/var/log/ansible.log`:
+```ini
+log_path = /var/log/ansible.log
+```
+Skapa filen och sätt rättigheter:
+```bash
+sudo touch /var/log/ansible.log
+sudo chmod 666 /var/log/ansible.log
+```
+
+### ✅ Kör om installationen
+```bash
+sudo ansible-galaxy install -r requirements.yml -p /etc/ansible/roles
+```
+
+---
+
 ## 💡 Advanced Tips
 - Use tags: `--tags preflight` or `--tags cni`
 - Keep variables in `group_vars` or role defaults
